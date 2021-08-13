@@ -7,7 +7,7 @@ target 'MovieLibrary' do
   pod 'SnapKit', '~> 5.0.0'
   pod "RxSwift"
   pod "RxCocoa"
-  pod 'RealmSwift'
+  # pod 'RealmSwift'
   # Pods for MovieLibrary
 
   target 'MovieLibraryTests' do
