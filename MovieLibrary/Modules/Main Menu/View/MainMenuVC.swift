@@ -16,7 +16,7 @@ class MainMenuVC: UIViewController {
     private var disposeBag = DisposeBag()
     private var tableView : UITableView = {
        var tableView = UITableView()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.register(SearchMovieCell.self, forCellReuseIdentifier: "cell")
         return tableView
     }()
     private var searchBar: UISearchBar = {
@@ -74,15 +74,13 @@ class MainMenuVC: UIViewController {
     func bindTableData(){
         
         //bind item to table
-        viewModel.items.bind(to: tableView.rx.items(cellIdentifier: "cell", cellType: UITableViewCell.self)) { row, item, cell in
-            cell.textLabel?.text = item.title
-            let url = URL(string: item.poster)
-            cell.imageView?.kf.setImage(with: url)
+        viewModel.items.bind(to: tableView.rx.items(cellIdentifier: "cell", cellType: SearchMovieCell.self)) { row, item, cell in
+            cell.bindData(item: item)
         }.disposed(by: disposeBag)
         
         //bind a model selected handler
-        tableView.rx.modelSelected(SearchDetail.self).bind { model in
-           let vc = MovieDetailVC()
+        tableView.rx.modelSelected(SearchDetail.self).bind { item in
+           let vc = MovieDetailVC(movieId: item.imdbID)
            self.navigationController?.pushViewController(vc, animated: true)
         }
 
