@@ -9,6 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import Kingfisher
 
 class MainMenuVC: UIViewController {
     
@@ -43,7 +44,7 @@ class MainMenuVC: UIViewController {
         title = "Movie Library"
         view.addSubview(searchBar)
         view.addSubview(tableView)
-        view.backgroundColor = .systemPurple
+        view.backgroundColor = .systemGray
     }
     
     func setupConstraint(){
@@ -62,7 +63,7 @@ class MainMenuVC: UIViewController {
         searchBar
             .rx.text
             .orEmpty
-            //.debounce(0.5, scheduler: MainScheduler.instance)
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .subscribe(onNext: { [unowned self] query in
                 self.viewModel.keyword = (query == "" ? nil : query)
@@ -75,12 +76,12 @@ class MainMenuVC: UIViewController {
         //bind item to table
         viewModel.items.bind(to: tableView.rx.items(cellIdentifier: "cell", cellType: UITableViewCell.self)) { row, item, cell in
             cell.textLabel?.text = item.title
-            //cell.description?.tex
-            //cell.imageView?.image = UIImage(systemName: "")
+            let url = URL(string: item.poster)
+            cell.imageView?.kf.setImage(with: url)
         }.disposed(by: disposeBag)
         
         //bind a model selected handler
-        tableView.rx.modelSelected(MovieModel.self).bind { model in
+        tableView.rx.modelSelected(SearchDetail.self).bind { model in
            let vc = MovieDetailVC()
            self.navigationController?.pushViewController(vc, animated: true)
         }
