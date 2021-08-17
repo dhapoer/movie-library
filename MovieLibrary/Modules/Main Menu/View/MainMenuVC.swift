@@ -18,7 +18,11 @@ class MainMenuVC: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         return tableView
     }()
-    private var searchBar: UISearchBar = UISearchBar()
+    private var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.placeholder = "Search for movies"
+        return searchBar
+    }()
     private var viewModel = MainMenuVM()
 
     override func viewDidLoad() {
@@ -61,7 +65,7 @@ class MainMenuVC: UIViewController {
             //.debounce(0.5, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .subscribe(onNext: { [unowned self] query in
-                self.viewModel.keyword = query
+                self.viewModel.keyword = (query == "" ? nil : query)
             })
             .disposed(by: disposeBag)
     }
@@ -70,8 +74,9 @@ class MainMenuVC: UIViewController {
         
         //bind item to table
         viewModel.items.bind(to: tableView.rx.items(cellIdentifier: "cell", cellType: UITableViewCell.self)) { row, item, cell in
-            cell.textLabel?.text = "Testing"
-            cell.imageView?.image = UIImage(systemName: "")
+            cell.textLabel?.text = item.title
+            //cell.description?.tex
+            //cell.imageView?.image = UIImage(systemName: "")
         }.disposed(by: disposeBag)
         
         //bind a model selected handler

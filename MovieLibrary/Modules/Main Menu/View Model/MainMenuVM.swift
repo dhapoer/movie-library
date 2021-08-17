@@ -11,7 +11,9 @@ import RxCocoa
 
 class MainMenuVM : NSObject {
     
-    var items = PublishSubject<[MovieModel]>()
+    private var disposeBag = DisposeBag()
+    
+    var items = PublishSubject<[SearchDetail]>()
     var keyword: String? = nil {
         didSet {
             loadData(keyword)
@@ -19,6 +21,21 @@ class MainMenuVM : NSObject {
     }
     
     func loadData(_ search: String? = nil){
-        
+        if let query = search {
+            APIService.request(apiRequest: APIRequest().searchMovieByName(search: query), codable: SearchModel.self).asObservable().subscribe(
+                onNext: { resp in
+                    self.items.onNext(resp.search)
+            }, onError: { error in
+                print(error)
+            }).disposed(by: disposeBag)
+        } else {
+            APIService.request(apiRequest: APIRequest().getInitialData(), codable: SearchModel.self).asObservable().subscribe(
+                onNext: { resp in
+                    self.items.onNext(resp.search)
+            }, onError: { error in
+                print(error)
+            }).disposed(by: disposeBag)
+        }
+
     }
 }
