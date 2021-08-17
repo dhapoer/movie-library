@@ -10,6 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import ShimmerSwift
 
 class MovieDetailVC: UIViewController {
     
@@ -77,6 +78,13 @@ class MovieDetailVC: UIViewController {
     }
     
     func setupEvent(){
+        viewModel.isLoading.asDriver(onErrorJustReturn: true).drive(onNext:{ [unowned self] in
+            if $0 {
+                self.showSpinner(onView: self.view)
+            } else {
+                self.removeSpinner()
+            }
+        }).disposed(by: disposeBag)
         viewModel.items.asDriver(onErrorJustReturn: nil).drive(onNext:{ [weak self] in
             if let data = $0 {
                 self?.titleLabel.text = data.title
@@ -88,4 +96,3 @@ class MovieDetailVC: UIViewController {
 
     }
 }
-
